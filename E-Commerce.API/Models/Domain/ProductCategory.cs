@@ -1,5 +1,8 @@
-﻿namespace E_Commerce.API.Models.Domain
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace E_Commerce.API.Models.Domain
 {
+    [Table("ProductCategory")]
     public class ProductCategory
     // Junction Table for Many-to-Many Relationship between Product and Category
     {

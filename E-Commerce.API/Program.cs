@@ -18,6 +18,14 @@ builder.Services.AddDbContext<ECommerceDbContext>(option =>
 
 var app = builder.Build();
 
+// Initialize the database with seed data
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<ECommerceDbContext>();
+    SeedData.Initialize(context);  // This will seed database with the initial data
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

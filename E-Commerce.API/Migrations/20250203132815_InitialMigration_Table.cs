@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace E_Commerce.API.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class InitialMigration_Table : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Categories",
+                name: "Category",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -22,11 +22,11 @@ namespace E_Commerce.API.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Categories", x => x.Id);
+                    table.PrimaryKey("PK_Category", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Orders",
+                name: "Order",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -36,11 +36,11 @@ namespace E_Commerce.API.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Orders", x => x.Id);
+                    table.PrimaryKey("PK_Order", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Products",
+                name: "Product",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -52,11 +52,11 @@ namespace E_Commerce.API.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Products", x => x.Id);
+                    table.PrimaryKey("PK_Product", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "OrderItems",
+                name: "OrderItem",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -68,17 +68,17 @@ namespace E_Commerce.API.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OrderItems", x => x.Id);
+                    table.PrimaryKey("PK_OrderItem", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_OrderItems_Orders_OrderId",
+                        name: "FK_OrderItem_Order_OrderId",
                         column: x => x.OrderId,
-                        principalTable: "Orders",
+                        principalTable: "Order",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_OrderItems_Products_ProductId",
+                        name: "FK_OrderItem_Product_ProductId",
                         column: x => x.ProductId,
-                        principalTable: "Products",
+                        principalTable: "Product",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -94,27 +94,27 @@ namespace E_Commerce.API.Migrations
                 {
                     table.PrimaryKey("PK_ProductCategory", x => new { x.ProductId, x.CategoryId });
                     table.ForeignKey(
-                        name: "FK_ProductCategory_Categories_CategoryId",
+                        name: "FK_ProductCategory_Category_CategoryId",
                         column: x => x.CategoryId,
-                        principalTable: "Categories",
+                        principalTable: "Category",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ProductCategory_Products_ProductId",
+                        name: "FK_ProductCategory_Product_ProductId",
                         column: x => x.ProductId,
-                        principalTable: "Products",
+                        principalTable: "Product",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrderItems_OrderId",
-                table: "OrderItems",
+                name: "IX_OrderItem_OrderId",
+                table: "OrderItem",
                 column: "OrderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrderItems_ProductId",
-                table: "OrderItems",
+                name: "IX_OrderItem_ProductId",
+                table: "OrderItem",
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
@@ -127,19 +127,19 @@ namespace E_Commerce.API.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "OrderItems");
+                name: "OrderItem");
 
             migrationBuilder.DropTable(
                 name: "ProductCategory");
 
             migrationBuilder.DropTable(
-                name: "Orders");
+                name: "Order");
 
             migrationBuilder.DropTable(
-                name: "Categories");
+                name: "Category");
 
             migrationBuilder.DropTable(
-                name: "Products");
+                name: "Product");
         }
     }
 }

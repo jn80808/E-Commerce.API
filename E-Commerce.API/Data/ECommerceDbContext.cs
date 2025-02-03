@@ -9,6 +9,8 @@ namespace ECommerceSystem
         public DbSet<Category> Categories { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
+        public DbSet<ProductCategory> ProductCategories { get; set; } 
+
 
         //Constructor of the class 
         public ECommerceDbContext(DbContextOptions<ECommerceDbContext> options) : base(options)
@@ -17,8 +19,12 @@ namespace ECommerceSystem
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //Configure Relationship
+            //Configure RelationshipYYYYY
             base.OnModelCreating(modelBuilder);
+
+            // Call the seed method from the separate file
+            SeedData.Seed(modelBuilder);
+
 
             // Configure the many-to-many relationship between Product and Category
             modelBuilder.Entity<ProductCategory>()

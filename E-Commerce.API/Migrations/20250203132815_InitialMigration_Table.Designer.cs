@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace E_Commerce.API.Migrations
 {
     [DbContext(typeof(ECommerceDbContext))]
-    [Migration("20250203082444_RenameProductTable")]
-    partial class RenameProductTable
+    [Migration("20250203132815_InitialMigration_Table")]
+    partial class InitialMigration_Table
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
