@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace E_Commerce.API.Models.Domain
 {
+    [Table("Product")]
     public class Product
     {
         [Key]

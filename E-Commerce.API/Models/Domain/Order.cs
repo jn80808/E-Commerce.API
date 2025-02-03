@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace E_Commerce.API.Models.Domain
 {
+    [Table("Order")]
     public class Order
     {
         [Key]
