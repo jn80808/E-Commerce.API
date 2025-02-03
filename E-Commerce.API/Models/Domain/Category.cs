@@ -17,5 +17,6 @@ namespace E_Commerce.API.Models.Domain
 
         // Many-to-Many Relationship with Product
         public ICollection<ProductCategory> ProductCategories { get; set; } = new List<ProductCategory>();
+    
     }
 }
