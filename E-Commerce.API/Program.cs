@@ -10,9 +10,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+//Ecommerce 
 builder.Services.AddDbContext<ECommerceDbContext>(option =>
 {
-    option.UseSqlServer(builder.Configuration.GetConnectionString("ECommerceConnectionStrings"));
+    option.UseSqlServer(builder.Configuration.GetConnectionString("ECommerceConnectionStrings"));//from appsetting connection string
 });
 
 
