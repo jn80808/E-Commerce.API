@@ -19,6 +19,7 @@ namespace E_Commerce.API.Controllers
             _context = context;
         }
 
+
         // GET: api/category
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
