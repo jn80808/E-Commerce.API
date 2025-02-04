@@ -63,8 +63,6 @@ public static class SeedData
         );
     }
 
-    internal static void Initialize(ECommerceDbContext context)
-    {
-        throw new NotImplementedException();
-    }
+ 
+
 }
