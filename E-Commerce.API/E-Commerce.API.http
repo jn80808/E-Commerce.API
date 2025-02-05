@@ -1,18 +1,7 @@
 ﻿@E-Commerce.API_HostAddress = https://localhost:7032
 
-GET {{E-Commerce.API_HostAddress}}/api/category
 
-###
-
-GET {{E-Commerce.API_HostAddress}}/api/product
-
-###
-
-GET {{E-Commerce.API_HostAddress}}/api/product
-
-###
-
-GET {{E-Commerce.API_HostAddress}}/api/product
+GET {{E-Commerce.API_HostAddress}}/api/reports/products/category/1
 
 ###
 
@@ -20,10 +9,10 @@ GET {{E-Commerce.API_HostAddress}}/api/reports/orders/lastmonth
 
 ###
 
-GET {{E-Commerce.API_HostAddress}}/api/reports/products/category/0
+GET {{E-Commerce.API_HostAddress}}/api/reports/sales/total
 
 ###
 
-GET {{E-Commerce.API_HostAddress}}/api/reports/sales/total
+GET {{E-Commerce.API_HostAddress}}/api/reports/sales/top5
 
 ###
