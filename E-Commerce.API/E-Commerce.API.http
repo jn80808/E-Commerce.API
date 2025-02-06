@@ -1,18 +1,71 @@
 ﻿@E-Commerce.API_HostAddress = https://localhost:7032
 
 
-GET {{E-Commerce.API_HostAddress}}/api/reports/products/category/1
+GET {{E-Commerce.API_HostAddress}}/api/product
 
 ###
 
-GET {{E-Commerce.API_HostAddress}}/api/reports/orders/lastmonth
+GET {{E-Commerce.API_HostAddress}}/api/product/3
 
 ###
 
-GET {{E-Commerce.API_HostAddress}}/api/reports/sales/total
+
+
+
+
+
+PUT {{E-Commerce.API_HostAddress}}/api/product/8
+Content-Type: application/json
+
+{
+  "name": "Integral Calculus",
+  "description": "Comprehensive guide covering calculus, linear algebra, and differential equations.",
+  "price":4000.99,
+  "stockQuantity": 75,
+  "productCategories": [
+    { "categoryId": 2 }
+  ]
+}
 
 ###
 
-GET {{E-Commerce.API_HostAddress}}/api/reports/sales/top5
+
+PUT {{E-Commerce.API_HostAddress}}/api/product/100
+Content-Type: application/json
+
+{
+  "id": 10,
+  "name": "Integral Calculus",
+  "description": "Comprehensive guide covering calculus, linear algebra, and differential equations.",
+  "price":4000.99,
+  "stockQuantity": 75,
+  "productCategories": [
+    { "categoryId": 2 }
+  ]
+}
+
+###
+
+DELETE {{E-Commerce.API_HostAddress}}/api/product/7
+
+###
+
+POST {{E-Commerce.API_HostAddress}}/api/product
+Content-Type: application/json
+
+{
+    "name": "Advanced Integrals",
+    "description": "Comprehensive guide covering calculus, linear algebra, and differential equations.",
+    "price": 4000.99,
+    "stockQuantity": 75,
+    "productCategories": [
+      { "categoryId": 2 }
+    ]
+  
+}
+
+###
+
+DELETE {{E-Commerce.API_HostAddress}}/api/product/9
 
 ###

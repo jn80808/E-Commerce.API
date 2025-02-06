@@ -23,7 +23,8 @@ namespace E_Commerce.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrders()
         {
-            return await _context.Orders.Include(o => o.OrderItems).ToListAsync();
+            var orders = await _context.Orders.Include(o => o.OrderItems).ToListAsync();
+            return Ok(orders);
         }
 
         // GET: api/order/5
@@ -36,16 +37,22 @@ namespace E_Commerce.API.Controllers
 
             if (order == null)
             {
-                return NotFound();
+                return NotFound(new { message = "Order not found." });
             }
 
-            return order;
+            return Ok(order);
         }
 
         // POST: api/order
         [HttpPost]
         public async Task<ActionResult<Order>> CreateOrder(Order order)
         {
+            // Optionally, you can validate if the order has items
+            if (order.OrderItems == null || !order.OrderItems.Any())
+            {
+                return BadRequest(new { message = "Order must have at least one item." });
+            }
+
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();
 
@@ -58,10 +65,19 @@ namespace E_Commerce.API.Controllers
         {
             if (id != order.Id)
             {
-                return BadRequest();
+                return BadRequest(new { message = "The provided ID does not match the order ID." });
             }
 
-            _context.Entry(order).State = EntityState.Modified;
+            var existingOrder = await _context.Orders.FindAsync(id);
+            if (existingOrder == null)
+            {
+                return NotFound(new { message = "Order not found." });
+            }
+
+            // Update order fields
+            existingOrder.CustomerName = order.CustomerName;
+            //existingOrder.Status = order.Status;
+            existingOrder.OrderItems = order.OrderItems; // Assuming the entire list of order items needs to be replaced
 
             try
             {
@@ -71,7 +87,7 @@ namespace E_Commerce.API.Controllers
             {
                 if (!_context.Orders.Any(o => o.Id == id))
                 {
-                    return NotFound();
+                    return NotFound(new { message = "Order not found." });
                 }
                 else
                 {
@@ -79,7 +95,7 @@ namespace E_Commerce.API.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok(new { message = "Order updated successfully.", order = existingOrder });
         }
 
         // DELETE: api/order/5
@@ -89,13 +105,13 @@ namespace E_Commerce.API.Controllers
             var order = await _context.Orders.FindAsync(id);
             if (order == null)
             {
-                return NotFound();
+                return NotFound(new { message = "Order not found." });
             }
 
             _context.Orders.Remove(order);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(new { message = "Order deleted successfully." });
         }
     }
 }

@@ -1,14 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using E_Commerce.API.Models.Domain;
-using ECommerceSystem;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
+using ECommerceSystem;
+using System.Text.Json.Serialization;
 
 namespace E_Commerce.API.Controllers
 {
-    //https://localhost:xxxx/api/product
     [Route("api/[controller]")]
     [ApiController]
     public class ProductController : ControllerBase
@@ -21,40 +22,55 @@ namespace E_Commerce.API.Controllers
             _context = context;
         }
 
+        // Create the JsonSerializerOptions once
+        private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
+        {
+            ReferenceHandler = ReferenceHandler.Preserve
+        };
+
         // GET: api/product
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
-            // Return all products from the database
-            return await _context.Products.ToListAsync();
+            var products = await _context.Products.ToListAsync();
+            var json = JsonSerializer.Serialize(products, JsonOptions);
+            return Content(json, "application/json");
         }
 
         // GET: api/product/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProduct(int id)
         {
-            // Find the product by ID
             var product = await _context.Products.FindAsync(id);
-
             if (product == null)
             {
                 return NotFound(); // Return 404 if the product is not found
             }
 
-            return product; // Return the product
+            var json = JsonSerializer.Serialize(product, JsonOptions);
+            return Content(json, "application/json");
         }
 
         // POST: api/product
         [HttpPost]
         public async Task<ActionResult<Product>> CreateProduct(Product product)
         {
-            // Add the new product to the database
+            var existingProduct = await _context.Products
+                .FirstOrDefaultAsync(p => p.Name == product.Name);
+
+            if (existingProduct != null)
+            {
+                return BadRequest(new { message = "Product already exists." });
+            }
+
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
 
-            // Return the created product with a 201 status code
-            return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
+            var json = JsonSerializer.Serialize(product);
+            return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, json);
         }
+
+
 
         // PUT: api/product/5
         [HttpPut("{id}")]
@@ -62,11 +78,20 @@ namespace E_Commerce.API.Controllers
         {
             if (id != product.Id)
             {
-                return BadRequest(); // Return 400 if the ID in the URL doesn't match the product ID
+                return BadRequest(new { message = "The provided ID does not match the product ID." });
             }
 
-            // Mark the product as modified and save changes
-            _context.Entry(product).State = EntityState.Modified;
+            var existingProduct = await _context.Products.FindAsync(id);
+            if (existingProduct == null)
+            {
+                return NotFound(new { message = "Product not found." });
+            }
+
+            // Update product fields
+            existingProduct.Name = product.Name;
+            existingProduct.Description = product.Description;
+            existingProduct.Price = product.Price;
+            existingProduct.StockQuantity = product.StockQuantity;
 
             try
             {
@@ -74,36 +99,28 @@ namespace E_Commerce.API.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!_context.Products.Any(p => p.Id == id))
-                {
-                    return NotFound(); // Return 404 if the product doesn't exist
-                }
-                else
-                {
-                    throw;
-                }
+                return Conflict(new { message = "Conflict detected while updating the product" });
             }
 
-            return NoContent(); // Return 204 (No Content) for successful updates
+            return Ok(existingProduct);
         }
+
 
         // DELETE: api/product/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
-            // Find the product by ID
             var product = await _context.Products.FindAsync(id);
-
             if (product == null)
             {
-                return NotFound(); // Return 404 if the product is not found
+                return NotFound(new { message = "Product not found." }); // Return 404 if the product is not found
             }
 
-            // Remove the product from the database
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
 
-            return NoContent(); // Return 204 (No Content) for successful deletion
+            return Ok(new { message = "Product deleted successfully." }); // Return a success message
         }
+
     }
 }

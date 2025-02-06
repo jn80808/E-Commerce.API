@@ -19,12 +19,12 @@ namespace E_Commerce.API.Controllers
             _context = context;
         }
 
-
         // GET: api/category
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
         {
-            return await _context.Categories.ToListAsync();
+            var categories = await _context.Categories.ToListAsync();
+            return Ok(categories);
         }
 
         // GET: api/category/5
@@ -35,16 +35,25 @@ namespace E_Commerce.API.Controllers
 
             if (category == null)
             {
-                return NotFound();
+                return NotFound(new { message = "Category not found." });
             }
 
-            return category;
+            return Ok(category);
         }
 
         // POST: api/category
         [HttpPost]
         public async Task<ActionResult<Category>> CreateCategory(Category category)
         {
+            // Check if a category with the same name already exists
+            var existingCategory = await _context.Categories
+                .FirstOrDefaultAsync(c => c.Name == category.Name);
+
+            if (existingCategory != null)
+            {
+                return BadRequest(new { message = "Category with this name already exists." });
+            }
+
             _context.Categories.Add(category);
             await _context.SaveChangesAsync();
 
@@ -57,10 +66,18 @@ namespace E_Commerce.API.Controllers
         {
             if (id != category.Id)
             {
-                return BadRequest();
+                return BadRequest(new { message = "The provided ID does not match the category ID." });
             }
 
-            _context.Entry(category).State = EntityState.Modified;
+            var existingCategory = await _context.Categories.FindAsync(id);
+            if (existingCategory == null)
+            {
+                return NotFound(new { message = "Category not found." });
+            }
+
+            // Update category fields
+            existingCategory.Name = category.Name;
+            existingCategory.Description = category.Description;
 
             try
             {
@@ -70,7 +87,7 @@ namespace E_Commerce.API.Controllers
             {
                 if (!_context.Categories.Any(c => c.Id == id))
                 {
-                    return NotFound();
+                    return NotFound(new { message = "Category not found." });
                 }
                 else
                 {
@@ -78,7 +95,7 @@ namespace E_Commerce.API.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok(new { message = "Category updated successfully.", category = existingCategory });
         }
 
         // DELETE: api/category/5
@@ -88,13 +105,13 @@ namespace E_Commerce.API.Controllers
             var category = await _context.Categories.FindAsync(id);
             if (category == null)
             {
-                return NotFound();
+                return NotFound(new { message = "Category not found." });
             }
 
             _context.Categories.Remove(category);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(new { message = "Category deleted successfully." });
         }
     }
 }
