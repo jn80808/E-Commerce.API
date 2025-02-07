@@ -5,6 +5,8 @@ using ECommerceSystem;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace E_Commerce.API.Controllers
 {
@@ -14,17 +16,25 @@ namespace E_Commerce.API.Controllers
     {
         private readonly ECommerceDbContext _context;
 
+        // Inject the DbContext into the controller
         public OrderController(ECommerceDbContext context)
         {
             _context = context;
         }
+        // Create the JsonSerializerOptions once
+        private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
+        {
+            ReferenceHandler = ReferenceHandler.Preserve
+        };
 
         // GET: api/order
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrders()
         {
             var orders = await _context.Orders.Include(o => o.OrderItems).ToListAsync();
-            return Ok(orders);
+            var json = JsonSerializer.Serialize(orders, JsonOptions);
+            return Content(json, "application/json");
+            
         }
 
         // GET: api/order/5
@@ -39,8 +49,10 @@ namespace E_Commerce.API.Controllers
             {
                 return NotFound(new { message = "Order not found." });
             }
+            var json = JsonSerializer.Serialize(order, JsonOptions);
+            return Content(json, "application/json");
 
-            return Ok(order);
+
         }
 
         // POST: api/order

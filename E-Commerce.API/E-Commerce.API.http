@@ -69,3 +69,77 @@ Content-Type: application/json
 DELETE {{E-Commerce.API_HostAddress}}/api/product/9
 
 ###
+
+GET {{E-Commerce.API_HostAddress}}/api/category
+
+###
+
+GET {{E-Commerce.API_HostAddress}}/api/category/5
+
+###
+
+POST {{E-Commerce.API_HostAddress}}/api/category
+Content-Type: application/json
+
+{    
+    "name": "Health",
+    "description": "wellness products"
+}
+
+###
+
+PUT {{E-Commerce.API_HostAddress}}/api/category/7
+Content-Type: application/json
+
+{
+    "id": 7,
+    "name": "Health",
+    "description": "personal care and wellness products"
+}
+
+###
+
+DELETE {{E-Commerce.API_HostAddress}}/api/category/6
+
+###
+
+
+GET {{E-Commerce.API_HostAddress}}/api/orderitem
+
+###
+
+
+GET {{E-Commerce.API_HostAddress}}/api/order/2
+
+###
+
+
+
+
+
+
+
+
+###
+
+POST {{E-Commerce.API_HostAddress}}/api/order
+Content-Type: application/json
+
+{
+  "customerName": "JOY NG",
+  "orderDate": "2025-02-07T00:00:00",
+  "orderItems": [
+    {
+      "productId": 3,
+      "quantity": 2,
+      "unitPrice": 20.00
+    },
+    {
+      "productId": 2,
+      "quantity": 10,
+      "unitPrice": 15.50
+    }
+  ]
+}
+
+###
