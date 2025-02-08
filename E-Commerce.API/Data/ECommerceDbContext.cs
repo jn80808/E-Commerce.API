@@ -42,7 +42,7 @@ namespace ECommerceSystem
 
             // Configure the one-to-many relationship between Order and OrderItem
             modelBuilder.Entity<Order>()
-                .HasMany(o => o.OrderItems)
+                .HasMany(o => o.OrderItem)
                 .WithOne(oi => oi.Order)
                 .HasForeignKey(oi => oi.OrderId);
 

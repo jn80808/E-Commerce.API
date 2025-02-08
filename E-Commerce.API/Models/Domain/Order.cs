@@ -16,6 +16,6 @@ namespace E_Commerce.API.Models.Domain
         public DateTime OrderDate { get; set; }
 
         // One-to-Many Relationship with OrderItem
-        public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+        public ICollection<OrderItem> OrderItem { get; set; } = new List<OrderItem>();
     }
 }

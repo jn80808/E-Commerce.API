@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace E_Commerce.API.Controllers
 {
@@ -31,7 +32,7 @@ namespace E_Commerce.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrders()
         {
-            var orders = await _context.Orders.Include(o => o.OrderItems).ToListAsync();
+            var orders = await _context.Orders.Include(o => o.OrderItem).ToListAsync();
             var json = JsonSerializer.Serialize(orders, JsonOptions);
             return Content(json, "application/json");
             
@@ -42,7 +43,7 @@ namespace E_Commerce.API.Controllers
         public async Task<ActionResult<Order>> GetOrder(int id)
         {
             var order = await _context.Orders
-                .Include(o => o.OrderItems)
+                .Include(o => o.OrderItem)
                 .FirstOrDefaultAsync(o => o.Id == id);
 
             if (order == null)
@@ -57,12 +58,15 @@ namespace E_Commerce.API.Controllers
 
         // POST: api/order
         [HttpPost]
-        public async Task<ActionResult<Order>> CreateOrder(Order order)
+        public async Task<IActionResult> CreateOrder([FromBody] Order order)
         {
-            // Optionally, you can validate if the order has items
-            if (order.OrderItems == null || !order.OrderItems.Any())
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            // Ensure OrderItems reference the new Order
+            foreach (var item in order.OrderItem)
             {
-                return BadRequest(new { message = "Order must have at least one item." });
+                item.OrderId = order.Id;  // Assign OrderId before saving
             }
 
             _context.Orders.Add(order);
@@ -71,25 +75,45 @@ namespace E_Commerce.API.Controllers
             return CreatedAtAction(nameof(GetOrder), new { id = order.Id }, order);
         }
 
+
         // PUT: api/order/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateOrder(int id, Order order)
+        public async Task<IActionResult> UpdateOrder(int id, [FromBody] Order order)
         {
+            if (order == null)
+            {
+                return BadRequest(new { message = "Invalid request. Order data is required." });
+            }
+
             if (id != order.Id)
             {
                 return BadRequest(new { message = "The provided ID does not match the order ID." });
             }
 
-            var existingOrder = await _context.Orders.FindAsync(id);
+            var existingOrder = await _context.Orders
+                .Include(o => o.OrderItem)
+                .FirstOrDefaultAsync(o => o.Id == id);
+
             if (existingOrder == null)
             {
                 return NotFound(new { message = "Order not found." });
             }
 
-            // Update order fields
+            _context.Entry(existingOrder).Reload(); // Reload to avoid concurrency issues
+
             existingOrder.CustomerName = order.CustomerName;
-            //existingOrder.Status = order.Status;
-            existingOrder.OrderItems = order.OrderItems; // Assuming the entire list of order items needs to be replaced
+            existingOrder.OrderDate = order.OrderDate;
+
+            // Remove old items
+            _context.OrderItems.RemoveRange(existingOrder.OrderItem);
+
+            // Add new items
+            foreach (var item in order.OrderItem)
+            {
+                item.OrderId = existingOrder.Id; // Ensure correct FK mapping
+                item.Id = 0; // Prevent conflicts
+                _context.OrderItems.Add(item);
+            }
 
             try
             {
@@ -97,18 +121,13 @@ namespace E_Commerce.API.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!_context.Orders.Any(o => o.Id == id))
-                {
-                    return NotFound(new { message = "Order not found." });
-                }
-                else
-                {
-                    throw;
-                }
+                return Conflict(new { message = "A conflict occurred while updating the order." });
             }
 
             return Ok(new { message = "Order updated successfully.", order = existingOrder });
         }
+
+
 
         // DELETE: api/order/5
         [HttpDelete("{id}")]
